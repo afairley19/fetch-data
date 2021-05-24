@@ -1,0 +1,68 @@
+---
+title: "Fetch Rewards Coding Exercise - Data Analyst"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+Ashley Fairley \
+May 2021 \
+
+Before reading the files into R for exploratory analysis, I used a couple lines of python to convert the json files:
+```
+import pandas as pd
+import json
+df = pd.read_json('PATH/receipts.json', lines = True)
+df.to_excel('PATH/receipts.xlsx')
+```
+
+```{r}
+options(scipen = 999)
+library(dlookr)
+
+receipts <- read.csv("receipts.csv")
+users <- read.csv("users.csv")
+brands <- read.csv("brands.csv")
+
+str(receipts)
+sum(is.na(receipts))
+receipts_na <- sapply(receipts, function(x) any(is.na(x)))
+names(receipts)[receipts_na]
+diagnose(receipts)
+
+str(users)
+sum(is.na(users))
+users_na <- sapply(users, function(x) any(is.na(x)))
+names(users)[users_na]
+diagnose(users)
+
+str(brands)
+sum(is.na(brands))
+brands_na <- sapply(brands, function(x) any(is.na(x)))
+names(brands)[brands_na]
+diagnose(brands)
+```
+
+All of the files contain missing values: \
+
+* receipts: 3560
+* users: 62
+* brands: 612
+
+The Receipts file is missing values in multiple columns: "dateScanned", "finishedDate", "modifyDate", "pointsAwardedDate", "pointsEarned", "purchaseDate", "purchasedItemCount", "totalSpent" \
+
+Users is missing values in one column: "lastLogin" \
+
+Brands is missing values in one column: "topBrand" \
+
+```{r}
+str(receipts$rewardsReceiptItemList)
+```
+
+One of the first issues I noticed was that the column, "rewardsReceiptItemList", contains too much information in each entry to be useful and should be split up in the database and stored separately. I created a table for receipt (purchased) items in my database diagram. If possible, it may be useful to create an additional table that lists all possible items that could earn awards in addition to the receipt_items table.
+
+```{r}
+str(users$createdDate)
+```
+
+Another issue would be to determine a preferred, unified way to store the dates for all tables in the database so that it is easy to read and use in queries. The json files have the dates formatted as a string of numbers. It might be best to correct how the dates are being retrieved.

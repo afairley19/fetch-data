@@ -1,0 +1,13 @@
+/* Ashley Fairley */
+/* Query to find the top 5 brands by receipts scanned for most recent month: */
+
+SELECT DISTINCT brands.name AS Brand, COUNT(receipt_items.barcode) AS Brand_Occurence
+FROM brands
+INNER JOIN receipt_items ON brands.barcode = receipt_items.barcode
+INNER JOIN receipts ON receipt_items.receiptId = receipts.receiptId
+WHERE receipts.purchaseDate BETWEEN datetime('now', 'start of month') AND datetime('now', 'localtime')
+GROUP BY brands.name
+ORDER BY COUNT(receipt_items.barcode) DESC
+LIMIT 5; 
+
+/* Could use SELECT TOP in SQLServer, but this was written for SQLiteStudio */
